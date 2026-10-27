@@ -665,7 +665,61 @@
 ></script>
 
 <!-- SCANYA -->
-<script src="app.js?v=4"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  console.log("SCANYA TEST OK");
+
+  const pages = document.querySelectorAll(".page");
+  const buttons = document.querySelectorAll("[data-page]");
+
+  function showPage(pageId) {
+
+    pages.forEach(function(page) {
+      page.classList.remove("active");
+    });
+
+    const page = document.getElementById(pageId);
+
+    if (page) {
+      page.classList.add("active");
+    }
+
+    document.querySelectorAll(".nav-button").forEach(function(button) {
+      button.classList.toggle(
+        "active",
+        button.dataset.page === pageId
+      );
+    });
+  }
+
+  buttons.forEach(function(button) {
+
+    button.addEventListener("click", function() {
+
+      const pageId = button.dataset.page;
+
+      if (pageId) {
+        showPage(pageId);
+      }
+
+    });
+
+  });
+
+  const scanner = document.getElementById("openScanner");
+  const camera = document.getElementById("receiptCamera");
+
+  if (scanner && camera) {
+
+    scanner.addEventListener("click", function() {
+      camera.click();
+    });
+
+  }
+
+});
+</script>
 
 </body>
 
