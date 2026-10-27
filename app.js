@@ -1,858 +1,227 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  /* ==========================================
-     CONFIGURACIÓN GOOGLE
-     ========================================== */
+  console.log("Scanya iniciado");
+
+  /* =========================
+     GOOGLE
+  ========================= */
 
   const GOOGLE_CLIENT_ID = 337441010397-j6c8equuhipa5tif7umvrnfr6v258jrr.apps.googleusercontent.com;
-
-  const DRIVE_SCOPE =
-    "https://www.googleapis.com/auth/drive.file";
-
-  const DRIVE_FOLDER_ID =
-    "1U6MlebqbmhnExo4crDaG9Ro98IZQz7Np";
-
 
   let googleAccessToken = null;
   let tokenClient = null;
 
 
-  /* ==========================================
-     ELEMENTOS DE SCANYA
-     ========================================== */
+  /* =========================
+     ELEMENTOS
+  ========================= */
 
-  const pages =
-    document.querySelectorAll(".page");
+  const pages = document.querySelectorAll(".page");
+  const navButtons = document.querySelectorAll(".nav-button");
+  const pageButtons = document.querySelectorAll("[data-page]");
 
-  const navButtons =
-    document.querySelectorAll(".nav-button");
+  const camera = document.getElementById("receiptCamera");
+  const openScanner = document.getElementById("openScanner");
+  const takeAnotherPhoto = document.getElementById("takeAnotherPhoto");
 
-  const pageButtons =
-    document.querySelectorAll("[data-page]");
+  const preview = document.getElementById("receiptPreview");
+  const previewPlaceholder = document.getElementById("previewPlaceholder");
 
+  const merchantInput = document.getElementById("merchant");
+  const dateInput = document.getElementById("receiptDate");
+  const totalInput = document.getElementById("receiptTotal");
+  const noteInput = document.getElementById("receiptNote");
 
-  const camera =
-    document.getElementById("receiptCamera");
+  const connectDriveBtn = document.getElementById("connectDriveBtn");
+  const driveStatus = document.getElementById("driveStatus");
+  const driveCard = document.querySelector(".drive-card");
 
-  const openScanner =
-    document.getElementById("openScanner");
-
-  const takeAnotherPhoto =
-    document.getElementById("takeAnotherPhoto");
-
-
-  const preview =
-    document.getElementById("receiptPreview");
-
-  const previewPlaceholder =
-    document.getElementById("previewPlaceholder");
+  let currentImage = "";
+  let selectedCategory = "Inventario";
 
 
-  const merchantInput =
-    document.getElementById("merchant");
+  /* =========================
+     FECHA
+  ========================= */
 
-  const dateInput =
-    document.getElementById("receiptDate");
+  function getToday() {
 
-  const totalInput =
-    document.getElementById("receiptTotal");
+    const now = new Date();
 
-  const noteInput =
-    document.getElementById("receiptNote");
+    const year = now.getFullYear();
 
+    const month = String(
+      now.getMonth() + 1
+    ).padStart(2, "0");
 
-  const connectDriveBtn =
-    document.getElementById("connectDriveBtn");
+    const day = String(
+      now.getDate()
+    ).padStart(2, "0");
 
-  const driveStatus =
-    document.getElementById("driveStatus");
+    return `${year}-${month}-${day}`;
+  }
 
-  const driveCard =
-    document.querySelector(".drive-card");
-
-
-  let selectedCategory =
-    "Inventario";
-
-  let currentImage =
-    "";
-
-
-  dateInput.value =
-    getToday();
-
-
-  /* ==========================================
-     GOOGLE DRIVE
-     ========================================== */
-
-  function initializeGoogle() {
-
-    if (
-      typeof google === "undefined" ||
-      !google.accounts
-    ) {
-
-      setTimeout(
-        initializeGoogle,
-        500
-      );
-
-      return;
-
-    }
-
-
-    tokenClient =
-      google.accounts.oauth2.initTokenClient({
-
-        client_id:
-          GOOGLE_CLIENT_ID,
-
-        scope:
-          DRIVE_SCOPE,
-
-        callback:
-          function (response) {
-
-            if (response.error) {
-
-              console.error(
-                response
-              );
-
-              alert(
-                "No se pudo conectar con Google Drive."
-              );
-
-              return;
-            }
-
-
-            googleAccessToken =
-              response.access_token;
-
-
-            driveStatus.textContent =
-              "Conectado";
-
-            connectDriveBtn.textContent =
-              "Conectado ✓";
-
-            driveCard.classList.add(
-              "connected"
-            );
-
-          }
-
-      });
-
+  if (dateInput) {
+    dateInput.value = getToday();
   }
 
 
-  connectDriveBtn.addEventListener(
-    "click",
-    function () {
-
-      if (!tokenClient) {
-
-        alert(
-          "Google todavía está cargando. Intenta nuevamente."
-        );
-
-        return;
-
-      }
-
-
-      if (googleAccessToken) {
-
-        alert(
-          "Google Drive ya está conectado."
-        );
-
-        return;
-
-      }
-
-
-      tokenClient.requestAccessToken({
-        prompt: "consent"
-      });
-
-    }
-  );
-
-
-  initializeGoogle();
-
-
-  /* ==========================================
+  /* =========================
      NAVEGACIÓN
-     ========================================== */
+  ========================= */
 
   function showPage(pageId) {
 
-    pages.forEach(
-      function (page) {
+    pages.forEach(function (page) {
+      page.classList.remove("active");
+    });
 
-        page.classList.remove(
-          "active"
-        );
-
-      }
-    );
-
-
-    const target =
-      document.getElementById(
-        pageId
-      );
-
+    const target = document.getElementById(pageId);
 
     if (target) {
-
-      target.classList.add(
-        "active"
-      );
-
+      target.classList.add("active");
     }
 
+    navButtons.forEach(function (button) {
 
-    navButtons.forEach(
-      function (button) {
-
-        button.classList.toggle(
-          "active",
-          button.dataset.page === pageId
-        );
-
+      if (button.dataset.page === pageId) {
+        button.classList.add("active");
+      } else {
+        button.classList.remove("active");
       }
-    );
+
+    });
+
+    window.scrollTo(0, 0);
+  }
 
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
+  pageButtons.forEach(function (button) {
+
+    button.addEventListener("click", function () {
+
+      const pageId = button.dataset.page;
+
+      if (pageId) {
+        showPage(pageId);
+      }
+
+    });
+
+  });
+
+
+  /* =========================
+     CÁMARA
+  ========================= */
+
+  if (openScanner) {
+
+    openScanner.addEventListener("click", function () {
+
+      if (camera) {
+        camera.click();
+      }
+
     });
 
   }
 
 
-  pageButtons.forEach(
-    function (button) {
+  if (takeAnotherPhoto) {
 
-      button.addEventListener(
-        "click",
-        function () {
+    takeAnotherPhoto.addEventListener("click", function () {
 
-          showPage(
-            button.dataset.page
-          );
+      if (camera) {
+        camera.click();
+      }
 
-        }
-      );
+    });
 
-    }
-  );
+  }
 
 
-  /* ==========================================
-     CÁMARA
-     ========================================== */
+  if (camera) {
 
-  openScanner.addEventListener(
-    "click",
-    function () {
+    camera.addEventListener("change", function () {
 
-      camera.click();
-
-    }
-  );
-
-
-  takeAnotherPhoto.addEventListener(
-    "click",
-    function () {
-
-      camera.click();
-
-    }
-  );
-
-
-  camera.addEventListener(
-    "change",
-    function () {
-
-      const file =
-        camera.files[0];
-
+      const file = camera.files[0];
 
       if (!file) {
-
         return;
-
       }
 
+      const reader = new FileReader();
 
-      const reader =
-        new FileReader();
+      reader.onload = function (event) {
 
+        currentImage = event.target.result;
 
-      reader.onload =
-        function (event) {
+        if (preview) {
 
-          currentImage =
-            event.target.result;
+          preview.src = currentImage;
+          preview.style.display = "block";
 
+        }
 
-          preview.src =
-            currentImage;
+        if (previewPlaceholder) {
+          previewPlaceholder.style.display = "none";
+        }
 
-
-          preview.style.display =
-            "block";
-
-
-          previewPlaceholder.style.display =
-            "none";
-
-
-          showPage(
-            "scannerPage"
-          );
-
-        };
-
-
-      reader.readAsDataURL(
-        file
-      );
-
-    }
-  );
-
-
-  /* ==========================================
-     CATEGORÍAS
-     ========================================== */
-
-  document
-    .querySelectorAll(".category")
-    .forEach(
-      function (button) {
-
-        button.addEventListener(
-          "click",
-          function () {
-
-            document
-              .querySelectorAll(".category")
-              .forEach(
-                function (item) {
-
-                  item.classList.remove(
-                    "selected"
-                  );
-
-                }
-              );
-
-
-            button.classList.add(
-              "selected"
-            );
-
-
-            selectedCategory =
-              button.dataset.category;
-
-          }
-        );
-
-      }
-    );
-
-
-  /* ==========================================
-     GUARDAR RECIBO
-     ========================================== */
-
-  document
-    .getElementById("saveReceipt")
-    .addEventListener(
-      "click",
-      saveReceipt
-    );
-
-
-  async function saveReceipt() {
-
-    const merchant =
-      merchantInput.value.trim();
-
-
-    const total =
-      Number(
-        totalInput.value
-      );
-
-
-    const date =
-      dateInput.value;
-
-
-    const note =
-      noteInput.value.trim();
-
-
-    if (!merchant) {
-
-      alert(
-        "Escribe el nombre del comercio."
-      );
-
-      return;
-
-    }
-
-
-    if (
-      !total ||
-      total <= 0
-    ) {
-
-      alert(
-        "Escribe el total del recibo."
-      );
-
-      return;
-
-    }
-
-
-    if (!currentImage) {
-
-      alert(
-        "Toma una foto del recibo."
-      );
-
-      return;
-
-    }
-
-
-    if (!googleAccessToken) {
-
-      alert(
-        "Primero conecta Google Drive."
-      );
-
-      showPage(
-        "homePage"
-      );
-
-      return;
-
-    }
-
-
-    const saveButton =
-      document.getElementById(
-        "saveReceipt"
-      );
-
-
-    saveButton.disabled =
-      true;
-
-
-    saveButton.textContent =
-      "Guardando en Drive...";
-
-
-    try {
-
-      const driveFile =
-        await uploadReceiptToDrive({
-
-          merchant,
-          total,
-          date,
-          category:
-            selectedCategory
-
-        });
-
-
-      const receipt = {
-
-        id:
-          Date.now(),
-
-        merchant,
-
-        total,
-
-        date,
-
-        category:
-          selectedCategory,
-
-        note,
-
-        image:
-          currentImage,
-
-        driveFileId:
-          driveFile.id,
-
-        driveLink:
-          driveFile.webViewLink || ""
+        showPage("scannerPage");
 
       };
 
+      reader.readAsDataURL(file);
 
-      const receipts =
-        getReceipts();
-
-
-      receipts.unshift(
-        receipt
-      );
-
-
-      try {
-
-        localStorage.setItem(
-          "scanyaReceipts",
-          JSON.stringify(
-            receipts
-          )
-        );
-
-      }
-
-      catch (error) {
-
-        console.warn(
-          "No se pudo guardar la imagen completa localmente.",
-          error
-        );
-
-
-        receipt.image =
-          "";
-
-
-        localStorage.setItem(
-          "scanyaReceipts",
-          JSON.stringify(
-            receipts
-          )
-        );
-
-      }
-
-
-      resetForm();
-
-      updateUI();
-
-      showPage(
-        "homePage"
-      );
-
-
-      alert(
-        "Recibo guardado en Google Drive ✅"
-      );
-
-    }
-
-    catch (error) {
-
-      console.error(
-        error
-      );
-
-
-      alert(
-        "Hubo un problema guardando el recibo en Google Drive."
-      );
-
-    }
-
-    finally {
-
-      saveButton.disabled =
-        false;
-
-
-      saveButton.textContent =
-        "Guardar recibo";
-
-    }
+    });
 
   }
 
 
-  /* ==========================================
-     SUBIR FOTO A GOOGLE DRIVE
-     ========================================== */
+  /* =========================
+     CATEGORÍAS
+  ========================= */
 
-  async function uploadReceiptToDrive(data) {
+  document
+    .querySelectorAll(".category")
+    .forEach(function (button) {
 
-    const imageBlob =
-      dataURLtoBlob(
-        currentImage
-      );
+      button.addEventListener("click", function () {
 
+        document
+          .querySelectorAll(".category")
+          .forEach(function (item) {
 
-    const extension =
-      imageBlob.type.includes(
-        "png"
-      )
-        ? "png"
-        : "jpg";
+            item.classList.remove("selected");
 
+          });
 
-    const cleanMerchant =
-      sanitizeFileName(
-        data.merchant
-      );
+        button.classList.add("selected");
 
+        selectedCategory =
+          button.dataset.category || "Otros";
 
-    const fileName =
-      data.date +
-      "_" +
-      cleanMerchant +
-      "_" +
-      data.total.toFixed(2) +
-      "." +
-      extension;
+      });
 
+    });
 
-    const metadata = {
 
-      name:
-        fileName,
-
-      parents:
-        [
-          DRIVE_FOLDER_ID
-        ],
-
-      description:
-        [
-          "Scanya Receipt",
-          "Merchant: " +
-            data.merchant,
-          "Total: $" +
-            data.total.toFixed(2),
-          "Category: " +
-            data.category
-        ].join(" | ")
-
-    };
-
-
-    const boundary =
-      "scanya_boundary_" +
-      Date.now();
-
-
-    const metadataBlob =
-      new Blob(
-
-        [
-          JSON.stringify(
-            metadata
-          )
-        ],
-
-        {
-          type:
-            "application/json"
-        }
-
-      );
-
-
-    const body =
-      new Blob(
-
-        [
-
-          "--" +
-          boundary +
-          "\r\n",
-
-          "Content-Type: application/json; charset=UTF-8\r\n\r\n",
-
-          metadataBlob,
-
-          "\r\n--" +
-          boundary +
-          "\r\n",
-
-          "Content-Type: " +
-          imageBlob.type +
-          "\r\n\r\n",
-
-          imageBlob,
-
-          "\r\n--" +
-          boundary +
-          "--"
-
-        ]
-
-      );
-
-
-    const response =
-      await fetch(
-
-        "https://www.googleapis.com/upload/drive/v3/files" +
-        "?uploadType=multipart" +
-        "&fields=id,name,webViewLink",
-
-        {
-
-          method:
-            "POST",
-
-          headers: {
-
-            Authorization:
-              "Bearer " +
-              googleAccessToken,
-
-            "Content-Type":
-              "multipart/related; boundary=" +
-              boundary
-
-          },
-
-          body:
-            body
-
-        }
-
-      );
-
-
-    if (!response.ok) {
-
-      const errorText =
-        await response.text();
-
-
-      throw new Error(
-        errorText
-      );
-
-    }
-
-
-    return await response.json();
-
-  }
-
-
-  /* ==========================================
-     FUNCIONES DE IMAGEN
-     ========================================== */
-
-  function dataURLtoBlob(dataURL) {
-
-    const parts =
-      dataURL.split(",");
-
-
-    const mime =
-      parts[0]
-        .match(
-          /:(.*?);/
-        )[1];
-
-
-    const binary =
-      atob(
-        parts[1]
-      );
-
-
-    const array =
-      new Uint8Array(
-        binary.length
-      );
-
-
-    for (
-      let i = 0;
-      i < binary.length;
-      i++
-    ) {
-
-      array[i] =
-        binary.charCodeAt(i);
-
-    }
-
-
-    return new Blob(
-      [array],
-      {
-        type:
-          mime
-      }
-    );
-
-  }
-
-
-  function sanitizeFileName(name) {
-
-    return name
-
-      .replace(
-        /[^a-z0-9]/gi,
-        "_"
-      )
-
-      .replace(
-        /_+/g,
-        "_"
-      )
-
-      .substring(
-        0,
-        40
-      );
-
-  }
-
-
-  /* ==========================================
+  /* =========================
      LOCAL STORAGE
-     ========================================== */
+  ========================= */
 
   function getReceipts() {
 
     try {
 
       return JSON.parse(
-        localStorage.getItem(
-          "scanyaReceipts"
-        )
+        localStorage.getItem("scanyaReceipts")
       ) || [];
 
-    }
+    } catch (error) {
 
-    catch (error) {
+      console.error(error);
 
       return [];
 
@@ -861,148 +230,57 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  function resetForm() {
+  function saveReceipts(receipts) {
 
-    merchantInput.value =
-      "";
-
-
-    totalInput.value =
-      "";
-
-
-    noteInput.value =
-      "";
-
-
-    dateInput.value =
-      getToday();
-
-
-    currentImage =
-      "";
-
-
-    camera.value =
-      "";
-
-
-    preview.src =
-      "";
-
-
-    preview.style.display =
-      "none";
-
-
-    previewPlaceholder.style.display =
-      "block";
-
-  }
-
-
-  /* ==========================================
-     UTILIDADES
-     ========================================== */
-
-  function getToday() {
-
-    const now =
-      new Date();
-
-
-    const year =
-      now.getFullYear();
-
-
-    const month =
-      String(
-        now.getMonth() + 1
-      ).padStart(
-        2,
-        "0"
-      );
-
-
-    const day =
-      String(
-        now.getDate()
-      ).padStart(
-        2,
-        "0"
-      );
-
-
-    return (
-      year +
-      "-" +
-      month +
-      "-" +
-      day
+    localStorage.setItem(
+      "scanyaReceipts",
+      JSON.stringify(receipts)
     );
 
   }
 
 
+  /* =========================
+     DINERO
+  ========================= */
+
   function money(value) {
 
-    return new Intl
-      .NumberFormat(
-
-        "en-US",
-
-        {
-
-          style:
-            "currency",
-
-          currency:
-            "USD"
-
-        }
-
-      )
-      .format(
-        value
-      );
+    return new Intl.NumberFormat(
+      "en-US",
+      {
+        style: "currency",
+        currency: "USD"
+      }
+    ).format(value);
 
   }
 
 
-  /* ==========================================
-     TARJETA DE RECIBO
-     ========================================== */
+  /* =========================
+     TARJETA RECIBO
+  ========================= */
 
   function receiptCard(receipt) {
-
-    const image =
-      receipt.image
-        ? receipt.image
-        : "";
-
 
     return `
 
       <div class="receipt-card">
 
         ${
-          image
-
-            ?
-
-            `
-            <img
-              class="receipt-thumb"
-              src="${image}"
-              alt="Recibo"
-            >
-            `
-
-            :
-
-            `
-            <div class="receipt-thumb"></div>
-            `
+          receipt.image
+          ?
+          `
+          <img
+            class="receipt-thumb"
+            src="${receipt.image}"
+            alt="Recibo"
+          >
+          `
+          :
+          `
+          <div class="receipt-thumb"></div>
+          `
         }
 
         <div class="receipt-info">
@@ -1012,24 +290,13 @@ document.addEventListener("DOMContentLoaded", function () {
           </strong>
 
           <div class="receipt-meta">
-
-            ${receipt.date}
-
-            ·
-
-            ${receipt.category}
-
+            ${receipt.date} · ${receipt.category}
           </div>
 
         </div>
 
-
         <div class="receipt-amount">
-
-          ${money(
-            receipt.total
-          )}
-
+          ${money(receipt.total)}
         </div>
 
       </div>
@@ -1039,147 +306,84 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  /* ==========================================
-     ACTUALIZAR INTERFAZ
-     ========================================== */
-
-  function updateUI() {
-
-    const receipts =
-      getReceipts();
-
-
-    updateHome(
-      receipts
-    );
-
-
-    updateReceipts(
-      receipts
-    );
-
-
-    updateExpenses(
-      receipts
-    );
-
-
-    updateReports(
-      receipts
-    );
-
-  }
-
+  /* =========================
+     ACTUALIZAR INICIO
+  ========================= */
 
   function updateHome(receipts) {
 
-    const today =
-      new Date();
+    const now = new Date();
 
+    const monthlyReceipts =
+      receipts.filter(function (receipt) {
 
-    const month =
-      today.getMonth();
+        const date =
+          new Date(receipt.date + "T12:00:00");
 
+        return (
+          date.getMonth() === now.getMonth() &&
+          date.getFullYear() === now.getFullYear()
+        );
 
-    const year =
-      today.getFullYear();
-
-
-    const monthReceipts =
-      receipts.filter(
-        function (receipt) {
-
-          const date =
-            new Date(
-              receipt.date +
-              "T12:00:00"
-            );
-
-
-          return (
-
-            date.getMonth() ===
-              month
-
-            &&
-
-            date.getFullYear() ===
-              year
-
-          );
-
-        }
-      );
+      });
 
 
     const total =
-      monthReceipts.reduce(
+      monthlyReceipts.reduce(
+        function (sum, receipt) {
 
-        function (
-          sum,
-          receipt
-        ) {
-
-          return (
-            sum +
-            receipt.total
-          );
+          return sum + Number(receipt.total);
 
         },
-
         0
-
       );
 
 
-    document
-      .getElementById(
-        "monthTotal"
-      )
-      .textContent =
-      money(
-        total
-      );
+    const monthTotal =
+      document.getElementById("monthTotal");
+
+    const receiptCount =
+      document.getElementById("receiptCount");
+
+    const currentMonth =
+      document.getElementById("currentMonth");
+
+    const recentReceipts =
+      document.getElementById("recentReceipts");
 
 
-    document
-      .getElementById(
-        "receiptCount"
-      )
-      .textContent =
-      monthReceipts.length +
-      " recibos";
+    if (monthTotal) {
+      monthTotal.textContent = money(total);
+    }
+
+    if (receiptCount) {
+
+      receiptCount.textContent =
+        monthlyReceipts.length + " recibos";
+
+    }
+
+    if (currentMonth) {
+
+      currentMonth.textContent =
+        now.toLocaleDateString(
+          "es-US",
+          {
+            month: "long"
+          }
+        );
+
+    }
 
 
-    document
-      .getElementById(
-        "currentMonth"
-      )
-      .textContent =
-      today.toLocaleDateString(
-
-        "es-US",
-
-        {
-          month:
-            "long"
-        }
-
-      );
+    if (!recentReceipts) {
+      return;
+    }
 
 
-    const recent =
-      document.getElementById(
-        "recentReceipts"
-      );
+    if (receipts.length === 0) {
 
-
-    if (
-      !receipts.length
-    ) {
-
-      recent.innerHTML =
-        `
+      recentReceipts.innerHTML = `
 
         <div class="empty-state">
 
@@ -1197,479 +401,617 @@ document.addEventListener("DOMContentLoaded", function () {
 
         </div>
 
-        `;
-
+      `;
 
       return;
-
     }
 
 
-    recent.innerHTML =
+    recentReceipts.innerHTML =
       receipts
-
-        .slice(
-          0,
-          4
-        )
-
-        .map(
-          receiptCard
-        )
-
-        .join(
-          ""
-        );
+        .slice(0, 4)
+        .map(receiptCard)
+        .join("");
 
   }
 
 
+  /* =========================
+     RECIBOS
+  ========================= */
+
   function updateReceipts(receipts) {
 
     const container =
-      document.getElementById(
-        "allReceipts"
-      );
+      document.getElementById("allReceipts");
+
+    if (!container) {
+      return;
+    }
 
 
-    if (
-      !receipts.length
-    ) {
+    if (receipts.length === 0) {
 
-      container.innerHTML =
-        `
+      container.innerHTML = `
 
         <div class="empty-state">
-
           No hay recibos guardados.
-
         </div>
 
-        `;
-
+      `;
 
       return;
-
     }
 
 
     container.innerHTML =
       receipts
-
-        .map(
-          receiptCard
-        )
-
-        .join(
-          ""
-        );
+        .map(receiptCard)
+        .join("");
 
   }
 
+
+  /* =========================
+     GASTOS
+  ========================= */
 
   function updateExpenses(receipts) {
 
     const total =
       receipts.reduce(
+        function (sum, receipt) {
 
-        function (
-          sum,
-          receipt
-        ) {
-
-          return (
-            sum +
-            receipt.total
-          );
+          return sum + Number(receipt.total);
 
         },
-
         0
-
       );
 
 
-    document
-      .getElementById(
-        "allTimeTotal"
-      )
-      .textContent =
-      money(
-        total
-      );
+    const totalElement =
+      document.getElementById("allTimeTotal");
+
+    if (totalElement) {
+      totalElement.textContent = money(total);
+    }
 
 
-    const categories =
-      {};
+    const categories = {};
 
 
-    receipts.forEach(
-      function (receipt) {
+    receipts.forEach(function (receipt) {
 
-        categories[
-          receipt.category
-        ] =
+      const category =
+        receipt.category || "Otros";
 
-          (
-            categories[
-              receipt.category
-            ] || 0
-          )
+      categories[category] =
+        (categories[category] || 0)
+        +
+        Number(receipt.total);
 
-          +
-
-          receipt.total;
-
-      }
-    );
+    });
 
 
     const container =
-      document.getElementById(
-        "categorySummary"
-      );
+      document.getElementById("categorySummary");
+
+    if (!container) {
+      return;
+    }
 
 
-    if (
-      !Object.keys(
-        categories
-      ).length
-    ) {
+    if (Object.keys(categories).length === 0) {
 
-      container.innerHTML =
-        `
+      container.innerHTML = `
 
         <div class="empty-state">
-
           No hay gastos registrados.
-
         </div>
 
-        `;
-
+      `;
 
       return;
-
     }
 
 
     container.innerHTML =
-      Object
+      Object.entries(categories)
 
-        .entries(
-          categories
-        )
+        .sort(function (a, b) {
+          return b[1] - a[1];
+        })
 
-        .sort(
-          function (
-            a,
-            b
-          ) {
+        .map(function (entry) {
 
-            return (
-              b[1] -
-              a[1]
-            );
+          return `
 
-          }
-        )
+            <div class="summary-row">
 
-        .map(
-          function (
-            entry
-          ) {
+              <span>
+                ${entry[0]}
+              </span>
 
-            const category =
-              entry[0];
+              <strong>
+                ${money(entry[1])}
+              </strong>
 
+            </div>
 
-            const amount =
-              entry[1];
+          `;
 
+        })
 
-            return `
-
-              <div class="summary-row">
-
-                <span>
-                  ${category}
-                </span>
-
-                <strong>
-                  ${money(amount)}
-                </strong>
-
-              </div>
-
-            `;
-
-          }
-        )
-
-        .join(
-          ""
-        );
+        .join("");
 
   }
 
 
+  /* =========================
+     REPORTES
+  ========================= */
+
   function updateReports(receipts) {
 
-    const now =
-      new Date();
+    const now = new Date();
 
 
     const monthly =
-      receipts.filter(
-        function (receipt) {
+      receipts.filter(function (receipt) {
 
-          const d =
-            new Date(
-              receipt.date +
-              "T12:00:00"
-            );
+        const date =
+          new Date(receipt.date + "T12:00:00");
 
+        return (
+          date.getMonth() === now.getMonth()
+          &&
+          date.getFullYear() === now.getFullYear()
+        );
 
-          return (
-
-            d.getMonth() ===
-              now.getMonth()
-
-            &&
-
-            d.getFullYear() ===
-              now.getFullYear()
-
-          );
-
-        }
-      );
+      });
 
 
     const monthlyTotal =
       monthly.reduce(
+        function (sum, receipt) {
 
-        function (
-          sum,
-          receipt
-        ) {
-
-          return (
-            sum +
-            receipt.total
-          );
+          return sum + Number(receipt.total);
 
         },
-
         0
-
       );
 
 
-    document
-      .getElementById(
-        "reportMonthTotal"
-      )
-      .textContent =
-      money(
-        monthlyTotal
-      );
+    const reportTotal =
+      document.getElementById("reportMonthTotal");
+
+    if (reportTotal) {
+      reportTotal.textContent = money(monthlyTotal);
+    }
 
 
-    const merchants =
-      {};
+    const merchants = {};
+
+    receipts.forEach(function (receipt) {
+
+      merchants[receipt.merchant] =
+        (merchants[receipt.merchant] || 0)
+        +
+        Number(receipt.total);
+
+    });
 
 
-    receipts.forEach(
-      function (receipt) {
-
-        merchants[
-          receipt.merchant
-        ] =
-
-          (
-            merchants[
-              receipt.merchant
-            ] || 0
-          )
-
-          +
-
-          receipt.total;
-
-      }
-    );
+    const merchantEntries =
+      Object.entries(merchants)
+        .sort(function (a, b) {
+          return b[1] - a[1];
+        });
 
 
     const topMerchant =
-      Object
+      document.getElementById("topMerchant");
 
-        .entries(
-          merchants
-        )
+    if (topMerchant) {
 
-        .sort(
-          function (
-            a,
-            b
-          ) {
+      topMerchant.textContent =
+        merchantEntries.length
+          ? merchantEntries[0][0]
+          : "—";
 
-            return (
-              b[1] -
-              a[1]
-            );
-
-          }
-        )[0];
+    }
 
 
-    document
-      .getElementById(
-        "topMerchant"
-      )
-      .textContent =
+    const categories = {};
 
-      topMerchant
-        ? topMerchant[0]
-        : "—";
+    receipts.forEach(function (receipt) {
+
+      const category =
+        receipt.category || "Otros";
+
+      categories[category] =
+        (categories[category] || 0)
+        +
+        Number(receipt.total);
+
+    });
 
 
-    const categories =
-      {};
-
-
-    receipts.forEach(
-      function (receipt) {
-
-        categories[
-          receipt.category
-        ] =
-
-          (
-            categories[
-              receipt.category
-            ] || 0
-          )
-
-          +
-
-          receipt.total;
-
-      }
-    );
+    const categoryEntries =
+      Object.entries(categories)
+        .sort(function (a, b) {
+          return b[1] - a[1];
+        });
 
 
     const topCategory =
-      Object
+      document.getElementById("topCategory");
 
-        .entries(
-          categories
-        )
+    if (topCategory) {
 
-        .sort(
-          function (
-            a,
-            b
-          ) {
+      topCategory.textContent =
+        categoryEntries.length
+          ? categoryEntries[0][0]
+          : "—";
 
-            return (
-              b[1] -
-              a[1]
-            );
-
-          }
-        )[0];
-
-
-    document
-      .getElementById(
-        "topCategory"
-      )
-      .textContent =
-
-      topCategory
-        ? topCategory[0]
-        : "—";
+    }
 
   }
 
 
-  /* ==========================================
-     BÚSQUEDA
-     ========================================== */
+  /* =========================
+     ACTUALIZAR TODO
+  ========================= */
 
-  document
-    .getElementById(
-      "receiptSearch"
-    )
-    .addEventListener(
+  function updateUI() {
 
+    const receipts =
+      getReceipts();
+
+    updateHome(receipts);
+    updateReceipts(receipts);
+    updateExpenses(receipts);
+    updateReports(receipts);
+
+  }
+
+
+  /* =========================
+     GUARDAR RECIBO
+  ========================= */
+
+  const saveReceiptButton =
+    document.getElementById("saveReceipt");
+
+
+  if (saveReceiptButton) {
+
+    saveReceiptButton.addEventListener(
+      "click",
+      function () {
+
+        const merchant =
+          merchantInput.value.trim();
+
+        const total =
+          Number(totalInput.value);
+
+        const date =
+          dateInput.value;
+
+        const note =
+          noteInput.value.trim();
+
+
+        if (!merchant) {
+
+          alert(
+            "Escribe el nombre del comercio."
+          );
+
+          return;
+        }
+
+
+        if (!total || total <= 0) {
+
+          alert(
+            "Escribe el total del recibo."
+          );
+
+          return;
+        }
+
+
+        const receipt = {
+
+          id: Date.now(),
+
+          merchant: merchant,
+
+          total: total,
+
+          date: date,
+
+          category: selectedCategory,
+
+          note: note,
+
+          image: currentImage
+
+        };
+
+
+        const receipts =
+          getReceipts();
+
+
+        receipts.unshift(receipt);
+
+
+        try {
+
+          saveReceipts(receipts);
+
+        } catch (error) {
+
+          console.error(error);
+
+          alert(
+            "No se pudo guardar localmente."
+          );
+
+          return;
+
+        }
+
+
+        merchantInput.value = "";
+        totalInput.value = "";
+        noteInput.value = "";
+        dateInput.value = getToday();
+
+        currentImage = "";
+
+        if (camera) {
+          camera.value = "";
+        }
+
+        if (preview) {
+          preview.src = "";
+          preview.style.display = "none";
+        }
+
+        if (previewPlaceholder) {
+          previewPlaceholder.style.display = "block";
+        }
+
+
+        updateUI();
+
+        showPage("homePage");
+
+        alert(
+          "Recibo guardado ✅"
+        );
+
+      }
+    );
+
+  }
+
+
+  /* =========================
+     BUSCADOR
+  ========================= */
+
+  const searchInput =
+    document.getElementById("receiptSearch");
+
+
+  if (searchInput) {
+
+    searchInput.addEventListener(
       "input",
-
       function () {
 
         const search =
-          this.value
+          searchInput.value
             .toLowerCase()
             .trim();
 
 
         const receipts =
-          getReceipts()
-            .filter(
+          getReceipts().filter(
+            function (receipt) {
 
-              function (
-                receipt
-              ) {
+              return receipt.merchant
+                .toLowerCase()
+                .includes(search);
 
-                return receipt
-                  .merchant
-                  .toLowerCase()
-                  .includes(
-                    search
-                  );
-
-              }
-
-            );
-
-
-        const container =
-          document.getElementById(
-            "allReceipts"
+            }
           );
 
 
-        container.innerHTML =
+        updateReceipts(receipts);
 
-          receipts.length
+      }
+    );
 
-            ?
+  }
 
-            receipts
-              .map(
-                receiptCard
-              )
-              .join(
-                ""
-              )
 
-            :
+  /* =========================
+     GOOGLE DRIVE
+     IMPORTANTE:
+     si Google falla, Scanya sigue funcionando
+  ========================= */
 
-            `
+  function initializeGoogle() {
 
-            <div class="empty-state">
+    try {
 
-              No encontramos recibos.
+      if (
+        typeof google === "undefined"
+        ||
+        !google.accounts
+        ||
+        !google.accounts.oauth2
+      ) {
 
-            </div>
+        console.log(
+          "Google todavía no está listo"
+        );
 
-            `;
+        return;
 
       }
 
+
+      if (
+        !GOOGLE_CLIENT_ID
+        ||
+        GOOGLE_CLIENT_ID ===
+          "PEGA_AQUI_TU_CLIENT_ID"
+      ) {
+
+        console.warn(
+          "Falta el Google Client ID"
+        );
+
+        return;
+
+      }
+
+
+      tokenClient =
+        google.accounts.oauth2.initTokenClient({
+
+          client_id:
+            GOOGLE_CLIENT_ID,
+
+          scope:
+            "https://www.googleapis.com/auth/drive.file",
+
+          callback:
+            function (response) {
+
+              if (
+                response.error
+              ) {
+
+                console.error(response);
+
+                alert(
+                  "Google no pudo conectarse."
+                );
+
+                return;
+              }
+
+
+              googleAccessToken =
+                response.access_token;
+
+
+              if (driveStatus) {
+                driveStatus.textContent =
+                  "Conectado";
+              }
+
+
+              if (connectDriveBtn) {
+
+                connectDriveBtn.textContent =
+                  "Conectado ✓";
+
+              }
+
+
+              if (driveCard) {
+
+                driveCard.classList.add(
+                  "connected"
+                );
+
+              }
+
+            }
+
+        });
+
+
+      console.log(
+        "Google Drive listo"
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Error de Google:",
+        error
+      );
+
+    }
+
+  }
+
+
+  if (connectDriveBtn) {
+
+    connectDriveBtn.addEventListener(
+      "click",
+      function () {
+
+        if (!tokenClient) {
+
+          initializeGoogle();
+
+        }
+
+
+        if (!tokenClient) {
+
+          alert(
+            "Google Drive todavía no está disponible. La app seguirá funcionando normalmente."
+          );
+
+          return;
+
+        }
+
+
+        try {
+
+          tokenClient.requestAccessToken({
+            prompt: "consent"
+          });
+
+        } catch (error) {
+
+          console.error(error);
+
+          alert(
+            "No se pudo abrir Google."
+          );
+
+        }
+
+      }
     );
 
+  }
+
+
+  setTimeout(
+    initializeGoogle,
+    1500
+  );
+
+
+  /* =========================
+     ARRANCAR SCANYA
+  ========================= */
 
   updateUI();
 
