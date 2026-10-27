@@ -13,11 +13,18 @@
   --success: #16a34a;
 }
 
+html,
 body {
   margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
   background: var(--background);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 button,
@@ -28,11 +35,17 @@ textarea {
 
 button {
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled {
+  cursor: default;
 }
 
 .app {
+  width: 100%;
   max-width: 560px;
-  margin: auto;
+  margin: 0 auto;
   min-height: 100vh;
   padding-bottom: 100px;
 }
@@ -66,6 +79,7 @@ button {
   background: var(--primary);
   color: white;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .page {
@@ -109,14 +123,10 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-
   background: white;
-
   border: 1px solid var(--border);
   border-radius: 18px;
-
   padding: 15px 16px;
-
   margin-bottom: 14px;
 }
 
@@ -139,6 +149,7 @@ button {
   font-weight: 700;
   padding: 10px 15px;
   border-radius: 12px;
+  flex-shrink: 0;
 }
 
 .drive-card.connected {
@@ -170,6 +181,11 @@ button {
   justify-content: center;
   gap: 10px;
   margin-bottom: 20px;
+  touch-action: manipulation;
+}
+
+.scan-button:active {
+  transform: scale(0.99);
 }
 
 .camera-icon {
@@ -193,6 +209,11 @@ button {
   gap: 5px;
   align-items: center;
   color: var(--text);
+  touch-action: manipulation;
+}
+
+.quick-card:active {
+  transform: scale(0.98);
 }
 
 .quick-icon {
@@ -258,11 +279,15 @@ button {
 
 .receipt-info {
   flex: 1;
+  min-width: 0;
 }
 
 .receipt-info strong {
   display: block;
   margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .receipt-meta {
@@ -273,6 +298,7 @@ button {
 .receipt-amount {
   font-weight: 800;
   font-size: 16px;
+  flex-shrink: 0;
 }
 
 .empty-state {
@@ -310,9 +336,10 @@ button {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background: rgba(255, 255, 255, 0.96);
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
-  padding: 9px 6px 12px;
+  padding: 9px 6px calc(12px + env(safe-area-inset-bottom));
   z-index: 100;
 }
 
@@ -325,6 +352,7 @@ button {
   align-items: center;
   gap: 3px;
   font-size: 19px;
+  touch-action: manipulation;
 }
 
 .nav-button small {
@@ -362,6 +390,7 @@ button {
   border-radius: 50%;
   background: white;
   font-size: 20px;
+  flex-shrink: 0;
 }
 
 .receipt-preview {
@@ -429,6 +458,7 @@ button {
   font-size: 16px;
   outline: none;
   background: #fafafa;
+  color: var(--text);
 }
 
 .form-card input:focus,
@@ -453,6 +483,7 @@ button {
   top: 50%;
   transform: translateY(-50%);
   color: var(--muted);
+  pointer-events: none;
 }
 
 .money-input input {
@@ -510,10 +541,12 @@ button {
 
 .search-box input {
   flex: 1;
+  min-width: 0;
   border: none;
   outline: none;
   padding: 14px 0;
   font-size: 15px;
+  background: transparent;
 }
 
 .expense-total-card {
@@ -624,5 +657,18 @@ button {
 
   .quick-card {
     padding: 15px 5px;
+  }
+
+  .hero-total {
+    font-size: 34px;
+  }
+
+  .report-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .report-card > span {
+    grid-column: 2;
+    text-align: left;
   }
 }
