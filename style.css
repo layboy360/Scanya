@@ -10,6 +10,7 @@
   --text: #111827;
   --muted: #6b7280;
   --border: #e5e7eb;
+  --success: #16a34a;
 }
 
 body {
@@ -101,6 +102,58 @@ button {
   gap: 8px;
   color: #cbd5e1;
   font-size: 13px;
+}
+
+.drive-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  background: white;
+
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  padding: 15px 16px;
+
+  margin-bottom: 14px;
+}
+
+.drive-card strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 3px;
+}
+
+.drive-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.drive-card button {
+  border: none;
+  background: #eff6ff;
+  color: var(--accent);
+  font-weight: 700;
+  padding: 10px 15px;
+  border-radius: 12px;
+}
+
+.drive-card.connected {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.drive-card.connected p {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.drive-card.connected button {
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .scan-button {
@@ -378,6 +431,12 @@ button {
   background: #fafafa;
 }
 
+.form-card input:focus,
+.form-card textarea:focus {
+  border-color: var(--accent);
+  background: white;
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -510,10 +569,20 @@ button {
   font-size: 20px;
 }
 
+.report-card strong {
+  font-size: 14px;
+}
+
 .report-card p {
   margin: 3px 0 0;
   color: var(--muted);
   font-size: 11px;
+}
+
+.report-card > span {
+  font-weight: 800;
+  font-size: 13px;
+  text-align: right;
 }
 
 .ai-card {
@@ -529,6 +598,10 @@ button {
   font-size: 30px;
 }
 
+.ai-card h2 {
+  margin: 7px 0;
+}
+
 .ai-card p {
   color: var(--muted);
   font-size: 13px;
@@ -542,4 +615,14 @@ button {
   background: #dbeafe;
   color: #64748b;
   font-weight: 600;
+}
+
+@media (max-width: 370px) {
+  .quick-grid {
+    gap: 6px;
+  }
+
+  .quick-card {
+    padding: 15px 5px;
+  }
 }
