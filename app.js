@@ -9,6 +9,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const GOOGLE_CLIENT_ID =
     "337441010397-j6c8equuhipa5tif7umvrnfr6v258jrr.apps.googleusercontent.com";
 
+  const DRIVE_SCOPE =
+    "https://www.googleapis.com/auth/drive.file";
+
+  const DRIVE_FOLDER_NAME =
+    "Scanya Receipts";
+
+  const DRIVE_FOLDER_STORAGE_KEY =
+    "scanyaDriveFolderId";
+
   let googleAccessToken = null;
   let tokenClient = null;
 
@@ -407,6 +416,7 @@ document.addEventListener("DOMContentLoaded", function () {
         {
           style:
             "currency",
+
           currency:
             "USD"
         }
@@ -452,23 +462,13 @@ document.addEventListener("DOMContentLoaded", function () {
           </strong>
 
           <div class="receipt-meta">
-
-            ${receipt.date}
-
-            ·
-
-            ${receipt.category}
-
+            ${receipt.date} · ${receipt.category}
           </div>
 
         </div>
 
         <div class="receipt-amount">
-
-          ${money(
-            receipt.total
-          )}
-
+          ${money(receipt.total)}
         </div>
 
       </div>
@@ -478,7 +478,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   /* =========================
-     INICIO
+     ACTUALIZAR INICIO
   ========================= */
 
   function updateHome(receipts) {
@@ -722,8 +722,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    const categories =
-      {};
+    const categories = {};
 
 
     receipts.forEach(
@@ -896,9 +895,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    const merchants =
-      {};
-
+    const merchants = {};
 
     receipts.forEach(
       function (receipt) {
@@ -958,9 +955,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    const categories =
-      {};
-
+    const categories = {};
 
     receipts.forEach(
       function (receipt) {
@@ -1057,6 +1052,364 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   /* =========================
+     CONVERTIR IMAGEN
+  ========================= */
+
+  function dataURLtoBlob(dataURL) {
+
+    const parts =
+      dataURL.split(",");
+
+    const mimeMatch =
+      parts[0].match(
+        /:(.*?);/
+      );
+
+    const mime =
+      mimeMatch
+        ?
+        mimeMatch[1]
+        :
+        "image/jpeg";
+
+    const binary =
+      atob(
+        parts[1]
+      );
+
+    const array =
+      new Uint8Array(
+        binary.length
+      );
+
+
+    for (
+      let i = 0;
+      i < binary.length;
+      i++
+    ) {
+
+      array[i] =
+        binary.charCodeAt(
+          i
+        );
+
+    }
+
+
+    return new Blob(
+      [array],
+      {
+        type:
+          mime
+      }
+    );
+
+  }
+
+
+  function cleanFileName(text) {
+
+    return String(text)
+      .trim()
+      .replace(
+        /[^a-z0-9áéíóúüñ_-]/gi,
+        "_"
+      )
+      .replace(
+        /_+/g,
+        "_"
+      )
+      .substring(
+        0,
+        60
+      );
+
+  }
+
+
+  /* =========================
+     CREAR CARPETA DRIVE
+  ========================= */
+
+  async function getOrCreateDriveFolder() {
+
+    const savedFolderId =
+      localStorage.getItem(
+        DRIVE_FOLDER_STORAGE_KEY
+      );
+
+
+    if (savedFolderId) {
+
+      return savedFolderId;
+
+    }
+
+
+    const response =
+      await fetch(
+        "https://www.googleapis.com/drive/v3/files?fields=id,name",
+        {
+          method:
+            "POST",
+
+          headers:
+            {
+              Authorization:
+                "Bearer " +
+                googleAccessToken,
+
+              "Content-Type":
+                "application/json"
+            },
+
+          body:
+            JSON.stringify(
+              {
+                name:
+                  DRIVE_FOLDER_NAME,
+
+                mimeType:
+                  "application/vnd.google-apps.folder"
+              }
+            )
+        }
+      );
+
+
+    if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      throw new Error(
+        "No se pudo crear la carpeta: " +
+        errorText
+      );
+
+    }
+
+
+    const folder =
+      await response.json();
+
+
+    localStorage.setItem(
+      DRIVE_FOLDER_STORAGE_KEY,
+      folder.id
+    );
+
+
+    return folder.id;
+
+  }
+
+
+  /* =========================
+     SUBIR FOTO A DRIVE
+  ========================= */
+
+  async function uploadReceiptToDrive(data) {
+
+    if (!googleAccessToken) {
+
+      throw new Error(
+        "Google Drive no está conectado."
+      );
+
+    }
+
+
+    const folderId =
+      await getOrCreateDriveFolder();
+
+
+    const imageBlob =
+      dataURLtoBlob(
+        currentImage
+      );
+
+
+    const extension =
+      imageBlob.type.includes(
+        "png"
+      )
+        ?
+        "png"
+        :
+        "jpg";
+
+
+    const fileName =
+      cleanFileName(
+        data.date
+      )
+      +
+      "_"
+      +
+      cleanFileName(
+        data.merchant
+      )
+      +
+      "_"
+      +
+      Number(
+        data.total
+      ).toFixed(
+        2
+      )
+      +
+      "_"
+      +
+      cleanFileName(
+        data.category
+      )
+      +
+      "."
+      +
+      extension;
+
+
+    /* Crear el archivo y metadata */
+
+    const metadataResponse =
+      await fetch(
+        "https://www.googleapis.com/drive/v3/files?fields=id,name,webViewLink",
+        {
+          method:
+            "POST",
+
+          headers:
+            {
+              Authorization:
+                "Bearer " +
+                googleAccessToken,
+
+              "Content-Type":
+                "application/json"
+            },
+
+          body:
+            JSON.stringify(
+              {
+                name:
+                  fileName,
+
+                parents:
+                  [
+                    folderId
+                  ],
+
+                mimeType:
+                  imageBlob.type,
+
+                description:
+                  "Scanya Receipt | "
+                  +
+                  "Comercio: "
+                  +
+                  data.merchant
+                  +
+                  " | Total: $"
+                  +
+                  Number(
+                    data.total
+                  ).toFixed(
+                    2
+                  )
+                  +
+                  " | Categoría: "
+                  +
+                  data.category
+                  +
+                  " | Fecha: "
+                  +
+                  data.date
+              }
+            )
+        }
+      );
+
+
+    if (!metadataResponse.ok) {
+
+      const errorText =
+        await metadataResponse.text();
+
+      throw new Error(
+        "No se pudo crear el archivo en Drive: " +
+        errorText
+      );
+
+    }
+
+
+    const metadata =
+      await metadataResponse.json();
+
+
+    /* Subir el contenido real de la foto */
+
+    const uploadResponse =
+      await fetch(
+        "https://www.googleapis.com/upload/drive/v3/files/"
+        +
+        metadata.id
+        +
+        "?uploadType=media",
+        {
+          method:
+            "PATCH",
+
+          headers:
+            {
+              Authorization:
+                "Bearer " +
+                googleAccessToken,
+
+              "Content-Type":
+                imageBlob.type
+            },
+
+          body:
+            imageBlob
+        }
+      );
+
+
+    if (!uploadResponse.ok) {
+
+      const errorText =
+        await uploadResponse.text();
+
+      throw new Error(
+        "No se pudo subir la imagen: " +
+        errorText
+      );
+
+    }
+
+
+    return {
+      id:
+        metadata.id,
+
+      name:
+        fileName,
+
+      link:
+        "https://drive.google.com/file/d/"
+        +
+        metadata.id
+        +
+        "/view"
+    };
+
+  }
+
+
+  /* =========================
      GUARDAR RECIBO
   ========================= */
 
@@ -1066,7 +1419,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     saveReceiptButton.addEventListener(
       "click",
-      function () {
+      async function () {
 
         const merchant =
           merchantInput
@@ -1124,56 +1477,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        const receipt =
-          {
-
-            id:
-              Date.now(),
-
-            merchant:
-              merchant,
-
-            total:
-              total,
-
-            date:
-              date,
-
-            category:
-              selectedCategory,
-
-            note:
-              note,
-
-            image:
-              currentImage
-
-          };
-
-
-        const receipts =
-          getReceipts();
-
-
-        receipts.unshift(
-          receipt
-        );
-
-
-        try {
-
-          saveReceipts(
-            receipts
-          );
-
-        } catch (error) {
-
-          console.error(
-            error
-          );
+        if (!currentImage) {
 
           alert(
-            "No se pudo guardar localmente."
+            "Primero toma una foto del recibo."
           );
 
           return;
@@ -1181,68 +1488,200 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        if (merchantInput) {
-          merchantInput.value = "";
-        }
+        if (!googleAccessToken) {
 
-        if (totalInput) {
-          totalInput.value = "";
-        }
+          alert(
+            "Primero conecta Google Drive."
+          );
 
-        if (noteInput) {
-          noteInput.value = "";
-        }
+          showPage(
+            "homePage"
+          );
 
-        if (dateInput) {
-          dateInput.value =
-            getToday();
+          return;
+
         }
 
 
-        currentImage =
-          "";
+        saveReceiptButton.disabled =
+          true;
+
+        saveReceiptButton.textContent =
+          "Subiendo a Drive...";
 
 
-        if (camera) {
+        try {
 
-          camera.value =
+          const driveFile =
+            await uploadReceiptToDrive(
+              {
+                merchant:
+                  merchant,
+
+                total:
+                  total,
+
+                date:
+                  date,
+
+                category:
+                  selectedCategory
+              }
+            );
+
+
+          const receipt =
+            {
+              id:
+                Date.now(),
+
+              merchant:
+                merchant,
+
+              total:
+                total,
+
+              date:
+                date,
+
+              category:
+                selectedCategory,
+
+              note:
+                note,
+
+              image:
+                currentImage,
+
+              driveFileId:
+                driveFile.id,
+
+              driveFileName:
+                driveFile.name,
+
+              driveLink:
+                driveFile.link
+            };
+
+
+          const receipts =
+            getReceipts();
+
+
+          receipts.unshift(
+            receipt
+          );
+
+
+          try {
+
+            saveReceipts(
+              receipts
+            );
+
+          } catch (storageError) {
+
+            console.warn(
+              "La imagen es demasiado grande para localStorage.",
+              storageError
+            );
+
+
+            receipt.image =
+              "";
+
+
+            saveReceipts(
+              receipts
+            );
+
+          }
+
+
+          if (merchantInput) {
+            merchantInput.value = "";
+          }
+
+          if (totalInput) {
+            totalInput.value = "";
+          }
+
+          if (noteInput) {
+            noteInput.value = "";
+          }
+
+          if (dateInput) {
+            dateInput.value =
+              getToday();
+          }
+
+
+          currentImage =
             "";
 
+
+          if (camera) {
+
+            camera.value =
+              "";
+
+          }
+
+
+          if (preview) {
+
+            preview.src =
+              "";
+
+            preview.style.display =
+              "none";
+
+          }
+
+
+          if (
+            previewPlaceholder
+          ) {
+
+            previewPlaceholder.style.display =
+              "block";
+
+          }
+
+
+          updateUI();
+
+
+          showPage(
+            "homePage"
+          );
+
+
+          alert(
+            "Recibo subido a Google Drive ✅"
+          );
+
+        } catch (error) {
+
+          console.error(
+            "Error subiendo recibo:",
+            error
+          );
+
+
+          alert(
+            "No se pudo subir el recibo a Google Drive. No se guardó."
+          );
+
+        } finally {
+
+          saveReceiptButton.disabled =
+            false;
+
+          saveReceiptButton.textContent =
+            "Guardar recibo";
+
         }
-
-
-        if (preview) {
-
-          preview.src =
-            "";
-
-          preview.style.display =
-            "none";
-
-        }
-
-
-        if (
-          previewPlaceholder
-        ) {
-
-          previewPlaceholder.style.display =
-            "block";
-
-        }
-
-
-        updateUI();
-
-
-        showPage(
-          "homePage"
-        );
-
-
-        alert(
-          "Recibo guardado ✅"
-        );
 
       }
     );
@@ -1295,7 +1734,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   /* =========================
-     GOOGLE DRIVE
+     GOOGLE DRIVE LOGIN
   ========================= */
 
   function initializeGoogle() {
@@ -1324,12 +1763,11 @@ document.addEventListener("DOMContentLoaded", function () {
         google.accounts.oauth2
           .initTokenClient(
             {
-
               client_id:
                 GOOGLE_CLIENT_ID,
 
               scope:
-                "https://www.googleapis.com/auth/drive.file",
+                DRIVE_SCOPE,
 
               callback:
                 function (response) {
@@ -1386,7 +1824,6 @@ document.addEventListener("DOMContentLoaded", function () {
                   }
 
                 }
-
             }
           );
 
@@ -1442,7 +1879,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ) {
 
           alert(
-            "Google todavía está cargando. Intenta nuevamente en unos segundos."
+            "Google todavía está cargando. Intenta nuevamente."
           );
 
           return;
@@ -1478,18 +1915,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  /* Intentar iniciar Google
-     después de que cargue la página */
+  /* =========================
+     ARRANCAR
+  ========================= */
 
   setTimeout(
     initializeGoogle,
     1500
   );
 
-
-  /* =========================
-     ARRANCAR SCANYA
-  ========================= */
 
   updateUI();
 
