@@ -9,14 +9,20 @@
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
 
+  <meta name="theme-color" content="#f4f6f8">
+
   <title>Scanya</title>
 
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 
 <body>
 
 <div class="app">
+
+  <!-- =========================
+       ENCABEZADO
+  ========================== -->
 
   <header class="topbar">
 
@@ -31,9 +37,13 @@
 
   </header>
 
+
   <main>
 
-    <!-- INICIO -->
+    <!-- =========================
+         INICIO
+    ========================== -->
+
     <section id="homePage" class="page active">
 
       <section class="hero">
@@ -63,21 +73,39 @@
       </section>
 
 
+      <!-- GOOGLE DRIVE -->
+
       <section class="drive-card">
 
         <div>
-          <strong>Google Drive</strong>
-          <p id="driveStatus">No conectado</p>
+
+          <strong>
+            Google Drive
+          </strong>
+
+          <p id="driveStatus">
+            No conectado
+          </p>
+
         </div>
 
-        <button id="connectDriveBtn">
+        <button
+          id="connectDriveBtn"
+          type="button"
+        >
           Conectar
         </button>
 
       </section>
 
 
-      <button class="scan-button" id="openScanner">
+      <!-- ESCANEAR -->
+
+      <button
+        class="scan-button"
+        id="openScanner"
+        type="button"
+      >
 
         <span class="camera-icon">
           📷
@@ -99,9 +127,15 @@
       >
 
 
+      <!-- ACCESOS RÁPIDOS -->
+
       <section class="quick-grid">
 
-        <button class="quick-card" data-page="receiptsPage">
+        <button
+          type="button"
+          class="quick-card"
+          data-page="receiptsPage"
+        >
 
           <span class="quick-icon">
             🧾
@@ -118,7 +152,11 @@
         </button>
 
 
-        <button class="quick-card" data-page="expensesPage">
+        <button
+          type="button"
+          class="quick-card"
+          data-page="expensesPage"
+        >
 
           <span class="quick-icon">
             💳
@@ -135,7 +173,11 @@
         </button>
 
 
-        <button class="quick-card" data-page="reportsPage">
+        <button
+          type="button"
+          class="quick-card"
+          data-page="reportsPage"
+        >
 
           <span class="quick-icon">
             📊
@@ -154,6 +196,8 @@
       </section>
 
 
+      <!-- ÚLTIMOS RECIBOS -->
+
       <section class="section">
 
         <div class="section-header">
@@ -162,14 +206,21 @@
             Últimos recibos
           </h2>
 
-          <button class="text-button" data-page="receiptsPage">
+          <button
+            type="button"
+            class="text-button"
+            data-page="receiptsPage"
+          >
             Ver todos
           </button>
 
         </div>
 
 
-        <div id="recentReceipts" class="receipt-list">
+        <div
+          id="recentReceipts"
+          class="receipt-list"
+        >
 
           <div class="empty-state">
 
@@ -195,12 +246,22 @@
 
 
 
-    <!-- ESCÁNER -->
-    <section id="scannerPage" class="page">
+    <!-- =========================
+         ESCÁNER
+    ========================== -->
+
+    <section
+      id="scannerPage"
+      class="page"
+    >
 
       <div class="page-title">
 
-        <button class="back-button" data-page="homePage">
+        <button
+          type="button"
+          class="back-button"
+          data-page="homePage"
+        >
           ←
         </button>
 
@@ -247,6 +308,7 @@
       <button
         id="takeAnotherPhoto"
         class="secondary-button"
+        type="button"
       >
         📷 Tomar otra foto
       </button>
@@ -254,7 +316,7 @@
 
       <section class="form-card">
 
-        <label>
+        <label for="merchant">
           Comercio
         </label>
 
@@ -269,7 +331,7 @@
 
           <div>
 
-            <label>
+            <label for="receiptDate">
               Fecha
             </label>
 
@@ -283,7 +345,7 @@
 
           <div>
 
-            <label>
+            <label for="receiptTotal">
               Total
             </label>
 
@@ -298,6 +360,7 @@
                 id="receiptTotal"
                 placeholder="0.00"
                 step="0.01"
+                min="0"
               >
 
             </div>
@@ -312,7 +375,10 @@
         </label>
 
 
-        <div class="category-grid" id="categoryGrid">
+        <div
+          class="category-grid"
+          id="categoryGrid"
+        >
 
           <button
             type="button"
@@ -365,7 +431,7 @@
         </div>
 
 
-        <label>
+        <label for="receiptNote">
           Nota
         </label>
 
@@ -381,6 +447,7 @@
       <button
         class="save-button"
         id="saveReceipt"
+        type="button"
       >
         Guardar recibo
       </button>
@@ -389,8 +456,14 @@
 
 
 
-    <!-- RECIBOS -->
-    <section id="receiptsPage" class="page">
+    <!-- =========================
+         RECIBOS
+    ========================== -->
+
+    <section
+      id="receiptsPage"
+      class="page"
+    >
 
       <div class="standard-header">
 
@@ -413,7 +486,7 @@
 
         <input
           id="receiptSearch"
-          type="text"
+          type="search"
           placeholder="Buscar comercio..."
         >
 
@@ -430,8 +503,14 @@
 
 
 
-    <!-- GASTOS -->
-    <section id="expensesPage" class="page">
+    <!-- =========================
+         GASTOS
+    ========================== -->
+
+    <section
+      id="expensesPage"
+      class="page"
+    >
 
       <div class="standard-header">
 
@@ -477,8 +556,14 @@
 
 
 
-    <!-- REPORTES -->
-    <section id="reportsPage" class="page">
+    <!-- =========================
+         REPORTES
+    ========================== -->
+
+    <section
+      id="reportsPage"
+      class="page"
+    >
 
       <div class="standard-header">
 
@@ -512,7 +597,7 @@
         </div>
 
         <span id="reportMonthTotal">
-          $0
+          $0.00
         </span>
 
       </section>
@@ -582,7 +667,10 @@
           Más adelante podrás analizar tus recibos directamente con ChatGPT.
         </p>
 
-        <button disabled>
+        <button
+          type="button"
+          disabled
+        >
           Próximamente
         </button>
 
@@ -594,15 +682,21 @@
 
 
 
-  <!-- NAVEGACIÓN -->
+  <!-- =========================
+       MENÚ INFERIOR
+  ========================== -->
+
   <nav class="bottom-nav">
 
     <button
+      type="button"
       class="nav-button active"
       data-page="homePage"
     >
 
-      <span>⌂</span>
+      <span>
+        ⌂
+      </span>
 
       <small>
         Inicio
@@ -612,11 +706,14 @@
 
 
     <button
+      type="button"
       class="nav-button"
       data-page="receiptsPage"
     >
 
-      <span>🧾</span>
+      <span>
+        🧾
+      </span>
 
       <small>
         Recibos
@@ -626,11 +723,14 @@
 
 
     <button
+      type="button"
       class="nav-button"
       data-page="expensesPage"
     >
 
-      <span>💳</span>
+      <span>
+        💳
+      </span>
 
       <small>
         Gastos
@@ -640,11 +740,14 @@
 
 
     <button
+      type="button"
       class="nav-button"
       data-page="reportsPage"
     >
 
-      <span>📊</span>
+      <span>
+        📊
+      </span>
 
       <small>
         Reportes
@@ -657,69 +760,19 @@
 </div>
 
 
-<!-- GOOGLE -->
+<!-- GOOGLE IDENTITY SERVICES -->
 <script
   src="https://accounts.google.com/gsi/client"
   async
   defer
 ></script>
 
+
 <!-- SCANYA -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-  console.log("SCANYA TEST OK");
-
-  const pages = document.querySelectorAll(".page");
-  const buttons = document.querySelectorAll("[data-page]");
-
-  function showPage(pageId) {
-
-    pages.forEach(function(page) {
-      page.classList.remove("active");
-    });
-
-    const page = document.getElementById(pageId);
-
-    if (page) {
-      page.classList.add("active");
-    }
-
-    document.querySelectorAll(".nav-button").forEach(function(button) {
-      button.classList.toggle(
-        "active",
-        button.dataset.page === pageId
-      );
-    });
-  }
-
-  buttons.forEach(function(button) {
-
-    button.addEventListener("click", function() {
-
-      const pageId = button.dataset.page;
-
-      if (pageId) {
-        showPage(pageId);
-      }
-
-    });
-
-  });
-
-  const scanner = document.getElementById("openScanner");
-  const camera = document.getElementById("receiptCamera");
-
-  if (scanner && camera) {
-
-    scanner.addEventListener("click", function() {
-      camera.click();
-    });
-
-  }
-
-});
-</script>
+<script
+  src="app.js?v=5"
+  defer
+></script>
 
 </body>
 
