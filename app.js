@@ -1,12 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  console.log("Scanya iniciado");
+  console.log("Scanya iniciado correctamente");
 
   /* =========================
      GOOGLE
   ========================= */
 
-  const GOOGLE_CLIENT_ID = 337441010397-j6c8equuhipa5tif7umvrnfr6v258jrr.apps.googleusercontent.com;
+  const GOOGLE_CLIENT_ID =
+    "337441010397-j6c8equuhipa5tif7umvrnfr6v258jrr.apps.googleusercontent.com";
 
   let googleAccessToken = null;
   let tokenClient = null;
@@ -16,25 +17,57 @@ document.addEventListener("DOMContentLoaded", function () {
      ELEMENTOS
   ========================= */
 
-  const pages = document.querySelectorAll(".page");
-  const navButtons = document.querySelectorAll(".nav-button");
-  const pageButtons = document.querySelectorAll("[data-page]");
+  const pages =
+    document.querySelectorAll(".page");
 
-  const camera = document.getElementById("receiptCamera");
-  const openScanner = document.getElementById("openScanner");
-  const takeAnotherPhoto = document.getElementById("takeAnotherPhoto");
+  const navButtons =
+    document.querySelectorAll(".nav-button");
 
-  const preview = document.getElementById("receiptPreview");
-  const previewPlaceholder = document.getElementById("previewPlaceholder");
+  const pageButtons =
+    document.querySelectorAll("[data-page]");
 
-  const merchantInput = document.getElementById("merchant");
-  const dateInput = document.getElementById("receiptDate");
-  const totalInput = document.getElementById("receiptTotal");
-  const noteInput = document.getElementById("receiptNote");
+  const camera =
+    document.getElementById("receiptCamera");
 
-  const connectDriveBtn = document.getElementById("connectDriveBtn");
-  const driveStatus = document.getElementById("driveStatus");
-  const driveCard = document.querySelector(".drive-card");
+  const openScanner =
+    document.getElementById("openScanner");
+
+  const takeAnotherPhoto =
+    document.getElementById("takeAnotherPhoto");
+
+  const preview =
+    document.getElementById("receiptPreview");
+
+  const previewPlaceholder =
+    document.getElementById("previewPlaceholder");
+
+  const merchantInput =
+    document.getElementById("merchant");
+
+  const dateInput =
+    document.getElementById("receiptDate");
+
+  const totalInput =
+    document.getElementById("receiptTotal");
+
+  const noteInput =
+    document.getElementById("receiptNote");
+
+  const connectDriveBtn =
+    document.getElementById("connectDriveBtn");
+
+  const driveStatus =
+    document.getElementById("driveStatus");
+
+  const driveCard =
+    document.querySelector(".drive-card");
+
+  const saveReceiptButton =
+    document.getElementById("saveReceipt");
+
+  const searchInput =
+    document.getElementById("receiptSearch");
+
 
   let currentImage = "";
   let selectedCategory = "Inventario";
@@ -48,21 +81,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const now = new Date();
 
-    const year = now.getFullYear();
+    const year =
+      now.getFullYear();
 
-    const month = String(
-      now.getMonth() + 1
-    ).padStart(2, "0");
+    const month =
+      String(
+        now.getMonth() + 1
+      ).padStart(
+        2,
+        "0"
+      );
 
-    const day = String(
-      now.getDate()
-    ).padStart(2, "0");
+    const day =
+      String(
+        now.getDate()
+      ).padStart(
+        2,
+        "0"
+      );
 
-    return `${year}-${month}-${day}`;
+    return (
+      year +
+      "-" +
+      month +
+      "-" +
+      day
+    );
   }
 
+
   if (dateInput) {
-    dateInput.value = getToday();
+    dateInput.value =
+      getToday();
   }
 
 
@@ -72,109 +122,189 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function showPage(pageId) {
 
-    pages.forEach(function (page) {
-      page.classList.remove("active");
-    });
+    pages.forEach(
+      function (page) {
 
-    const target = document.getElementById(pageId);
+        page.classList.remove(
+          "active"
+        );
+
+      }
+    );
+
+
+    const target =
+      document.getElementById(
+        pageId
+      );
+
 
     if (target) {
-      target.classList.add("active");
+
+      target.classList.add(
+        "active"
+      );
+
     }
 
-    navButtons.forEach(function (button) {
 
-      if (button.dataset.page === pageId) {
-        button.classList.add("active");
-      } else {
-        button.classList.remove("active");
+    navButtons.forEach(
+      function (button) {
+
+        if (
+          button.dataset.page ===
+          pageId
+        ) {
+
+          button.classList.add(
+            "active"
+          );
+
+        } else {
+
+          button.classList.remove(
+            "active"
+          );
+
+        }
+
       }
+    );
 
-    });
 
-    window.scrollTo(0, 0);
+    window.scrollTo(
+      0,
+      0
+    );
   }
 
 
-  pageButtons.forEach(function (button) {
+  pageButtons.forEach(
+    function (button) {
 
-    button.addEventListener("click", function () {
+      button.addEventListener(
+        "click",
+        function () {
 
-      const pageId = button.dataset.page;
+          const pageId =
+            button.dataset.page;
 
-      if (pageId) {
-        showPage(pageId);
-      }
 
-    });
+          if (pageId) {
 
-  });
+            showPage(
+              pageId
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
 
 
   /* =========================
      CÁMARA
   ========================= */
 
-  if (openScanner) {
+  if (
+    openScanner &&
+    camera
+  ) {
 
-    openScanner.addEventListener("click", function () {
+    openScanner.addEventListener(
+      "click",
+      function () {
 
-      if (camera) {
         camera.click();
-      }
 
-    });
+      }
+    );
 
   }
 
 
-  if (takeAnotherPhoto) {
+  if (
+    takeAnotherPhoto &&
+    camera
+  ) {
 
-    takeAnotherPhoto.addEventListener("click", function () {
+    takeAnotherPhoto.addEventListener(
+      "click",
+      function () {
 
-      if (camera) {
         camera.click();
-      }
 
-    });
+      }
+    );
 
   }
 
 
   if (camera) {
 
-    camera.addEventListener("change", function () {
+    camera.addEventListener(
+      "change",
+      function () {
 
-      const file = camera.files[0];
+        const file =
+          camera.files[0];
 
-      if (!file) {
-        return;
+
+        if (!file) {
+
+          return;
+
+        }
+
+
+        const reader =
+          new FileReader();
+
+
+        reader.onload =
+          function (event) {
+
+            currentImage =
+              event.target.result;
+
+
+            if (preview) {
+
+              preview.src =
+                currentImage;
+
+              preview.style.display =
+                "block";
+
+            }
+
+
+            if (
+              previewPlaceholder
+            ) {
+
+              previewPlaceholder.style.display =
+                "none";
+
+            }
+
+
+            showPage(
+              "scannerPage"
+            );
+
+          };
+
+
+        reader.readAsDataURL(
+          file
+        );
+
       }
-
-      const reader = new FileReader();
-
-      reader.onload = function (event) {
-
-        currentImage = event.target.result;
-
-        if (preview) {
-
-          preview.src = currentImage;
-          preview.style.display = "block";
-
-        }
-
-        if (previewPlaceholder) {
-          previewPlaceholder.style.display = "none";
-        }
-
-        showPage("scannerPage");
-
-      };
-
-      reader.readAsDataURL(file);
-
-    });
+    );
 
   }
 
@@ -184,27 +314,45 @@ document.addEventListener("DOMContentLoaded", function () {
   ========================= */
 
   document
-    .querySelectorAll(".category")
-    .forEach(function (button) {
+    .querySelectorAll(
+      ".category"
+    )
+    .forEach(
+      function (button) {
 
-      button.addEventListener("click", function () {
+        button.addEventListener(
+          "click",
+          function () {
 
-        document
-          .querySelectorAll(".category")
-          .forEach(function (item) {
+            document
+              .querySelectorAll(
+                ".category"
+              )
+              .forEach(
+                function (item) {
 
-            item.classList.remove("selected");
+                  item.classList.remove(
+                    "selected"
+                  );
 
-          });
+                }
+              );
 
-        button.classList.add("selected");
 
-        selectedCategory =
-          button.dataset.category || "Otros";
+            button.classList.add(
+              "selected"
+            );
 
-      });
 
-    });
+            selectedCategory =
+              button.dataset.category ||
+              "Otros";
+
+          }
+        );
+
+      }
+    );
 
 
   /* =========================
@@ -216,12 +364,17 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
 
       return JSON.parse(
-        localStorage.getItem("scanyaReceipts")
+        localStorage.getItem(
+          "scanyaReceipts"
+        )
       ) || [];
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Error leyendo recibos:",
+        error
+      );
 
       return [];
 
@@ -234,7 +387,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     localStorage.setItem(
       "scanyaReceipts",
-      JSON.stringify(receipts)
+      JSON.stringify(
+        receipts
+      )
     );
 
   }
@@ -246,13 +401,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function money(value) {
 
-    return new Intl.NumberFormat(
-      "en-US",
-      {
-        style: "currency",
-        currency: "USD"
-      }
-    ).format(value);
+    return new Intl
+      .NumberFormat(
+        "en-US",
+        {
+          style:
+            "currency",
+          currency:
+            "USD"
+        }
+      )
+      .format(
+        Number(value) || 0
+      );
 
   }
 
@@ -263,25 +424,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function receiptCard(receipt) {
 
-    return `
+    const imageHtml =
+      receipt.image
+        ?
+        `
+        <img
+          class="receipt-thumb"
+          src="${receipt.image}"
+          alt="Recibo"
+        >
+        `
+        :
+        `
+        <div class="receipt-thumb"></div>
+        `;
 
+
+    return `
       <div class="receipt-card">
 
-        ${
-          receipt.image
-          ?
-          `
-          <img
-            class="receipt-thumb"
-            src="${receipt.image}"
-            alt="Recibo"
-          >
-          `
-          :
-          `
-          <div class="receipt-thumb"></div>
-          `
-        }
+        ${imageHtml}
 
         <div class="receipt-info">
 
@@ -290,49 +452,77 @@ document.addEventListener("DOMContentLoaded", function () {
           </strong>
 
           <div class="receipt-meta">
-            ${receipt.date} · ${receipt.category}
+
+            ${receipt.date}
+
+            ·
+
+            ${receipt.category}
+
           </div>
 
         </div>
 
         <div class="receipt-amount">
-          ${money(receipt.total)}
+
+          ${money(
+            receipt.total
+          )}
+
         </div>
 
       </div>
-
     `;
 
   }
 
 
   /* =========================
-     ACTUALIZAR INICIO
+     INICIO
   ========================= */
 
   function updateHome(receipts) {
 
-    const now = new Date();
+    const now =
+      new Date();
+
 
     const monthlyReceipts =
-      receipts.filter(function (receipt) {
+      receipts.filter(
+        function (receipt) {
 
-        const date =
-          new Date(receipt.date + "T12:00:00");
+          const date =
+            new Date(
+              receipt.date +
+              "T12:00:00"
+            );
 
-        return (
-          date.getMonth() === now.getMonth() &&
-          date.getFullYear() === now.getFullYear()
-        );
 
-      });
+          return (
+            date.getMonth() ===
+              now.getMonth()
+            &&
+            date.getFullYear() ===
+              now.getFullYear()
+          );
+
+        }
+      );
 
 
     const total =
       monthlyReceipts.reduce(
-        function (sum, receipt) {
+        function (
+          sum,
+          receipt
+        ) {
 
-          return sum + Number(receipt.total);
+          return (
+            sum +
+            Number(
+              receipt.total
+            )
+          );
 
         },
         0
@@ -340,28 +530,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     const monthTotal =
-      document.getElementById("monthTotal");
+      document.getElementById(
+        "monthTotal"
+      );
 
     const receiptCount =
-      document.getElementById("receiptCount");
+      document.getElementById(
+        "receiptCount"
+      );
 
     const currentMonth =
-      document.getElementById("currentMonth");
+      document.getElementById(
+        "currentMonth"
+      );
 
     const recentReceipts =
-      document.getElementById("recentReceipts");
+      document.getElementById(
+        "recentReceipts"
+      );
 
 
     if (monthTotal) {
-      monthTotal.textContent = money(total);
+
+      monthTotal.textContent =
+        money(
+          total
+        );
+
     }
+
 
     if (receiptCount) {
 
       receiptCount.textContent =
-        monthlyReceipts.length + " recibos";
+        monthlyReceipts.length +
+        " recibos";
 
     }
+
 
     if (currentMonth) {
 
@@ -369,7 +575,8 @@ document.addEventListener("DOMContentLoaded", function () {
         now.toLocaleDateString(
           "es-US",
           {
-            month: "long"
+            month:
+              "long"
           }
         );
 
@@ -377,14 +584,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     if (!recentReceipts) {
+
       return;
+
     }
 
 
-    if (receipts.length === 0) {
+    if (
+      receipts.length === 0
+    ) {
 
-      recentReceipts.innerHTML = `
-
+      recentReceipts.innerHTML =
+        `
         <div class="empty-state">
 
           <div class="empty-icon">
@@ -400,18 +611,25 @@ document.addEventListener("DOMContentLoaded", function () {
           </p>
 
         </div>
-
-      `;
+        `;
 
       return;
+
     }
 
 
     recentReceipts.innerHTML =
       receipts
-        .slice(0, 4)
-        .map(receiptCard)
-        .join("");
+        .slice(
+          0,
+          4
+        )
+        .map(
+          receiptCard
+        )
+        .join(
+          ""
+        );
 
   }
 
@@ -423,31 +641,42 @@ document.addEventListener("DOMContentLoaded", function () {
   function updateReceipts(receipts) {
 
     const container =
-      document.getElementById("allReceipts");
+      document.getElementById(
+        "allReceipts"
+      );
+
 
     if (!container) {
+
       return;
+
     }
 
 
-    if (receipts.length === 0) {
+    if (
+      receipts.length === 0
+    ) {
 
-      container.innerHTML = `
-
+      container.innerHTML =
+        `
         <div class="empty-state">
           No hay recibos guardados.
         </div>
-
-      `;
+        `;
 
       return;
+
     }
 
 
     container.innerHTML =
       receipts
-        .map(receiptCard)
-        .join("");
+        .map(
+          receiptCard
+        )
+        .join(
+          ""
+        );
 
   }
 
@@ -460,9 +689,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const total =
       receipts.reduce(
-        function (sum, receipt) {
+        function (
+          sum,
+          receipt
+        ) {
 
-          return sum + Number(receipt.total);
+          return (
+            sum +
+            Number(
+              receipt.total
+            )
+          );
 
         },
         0
@@ -470,79 +707,123 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     const totalElement =
-      document.getElementById("allTimeTotal");
+      document.getElementById(
+        "allTimeTotal"
+      );
+
 
     if (totalElement) {
-      totalElement.textContent = money(total);
+
+      totalElement.textContent =
+        money(
+          total
+        );
+
     }
 
 
-    const categories = {};
+    const categories =
+      {};
 
 
-    receipts.forEach(function (receipt) {
+    receipts.forEach(
+      function (receipt) {
 
-      const category =
-        receipt.category || "Otros";
+        const category =
+          receipt.category ||
+          "Otros";
 
-      categories[category] =
-        (categories[category] || 0)
-        +
-        Number(receipt.total);
 
-    });
+        categories[
+          category
+        ] =
+          (
+            categories[
+              category
+            ] || 0
+          )
+          +
+          Number(
+            receipt.total
+          );
+
+      }
+    );
 
 
     const container =
-      document.getElementById("categorySummary");
+      document.getElementById(
+        "categorySummary"
+      );
+
 
     if (!container) {
+
       return;
+
     }
 
 
-    if (Object.keys(categories).length === 0) {
+    if (
+      Object.keys(
+        categories
+      ).length === 0
+    ) {
 
-      container.innerHTML = `
-
+      container.innerHTML =
+        `
         <div class="empty-state">
           No hay gastos registrados.
         </div>
-
-      `;
+        `;
 
       return;
+
     }
 
 
     container.innerHTML =
-      Object.entries(categories)
+      Object
+        .entries(
+          categories
+        )
+        .sort(
+          function (
+            a,
+            b
+          ) {
 
-        .sort(function (a, b) {
-          return b[1] - a[1];
-        })
+            return (
+              b[1] -
+              a[1]
+            );
 
-        .map(function (entry) {
+          }
+        )
+        .map(
+          function (entry) {
 
-          return `
+            return `
+              <div class="summary-row">
 
-            <div class="summary-row">
+                <span>
+                  ${entry[0]}
+                </span>
 
-              <span>
-                ${entry[0]}
-              </span>
+                <strong>
+                  ${money(
+                    entry[1]
+                  )}
+                </strong>
 
-              <strong>
-                ${money(entry[1])}
-              </strong>
+              </div>
+            `;
 
-            </div>
-
-          `;
-
-        })
-
-        .join("");
+          }
+        )
+        .join(
+          ""
+        );
 
   }
 
@@ -553,29 +834,46 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateReports(receipts) {
 
-    const now = new Date();
+    const now =
+      new Date();
 
 
     const monthly =
-      receipts.filter(function (receipt) {
+      receipts.filter(
+        function (receipt) {
 
-        const date =
-          new Date(receipt.date + "T12:00:00");
+          const date =
+            new Date(
+              receipt.date +
+              "T12:00:00"
+            );
 
-        return (
-          date.getMonth() === now.getMonth()
-          &&
-          date.getFullYear() === now.getFullYear()
-        );
 
-      });
+          return (
+            date.getMonth() ===
+              now.getMonth()
+            &&
+            date.getFullYear() ===
+              now.getFullYear()
+          );
+
+        }
+      );
 
 
     const monthlyTotal =
       monthly.reduce(
-        function (sum, receipt) {
+        function (
+          sum,
+          receipt
+        ) {
 
-          return sum + Number(receipt.total);
+          return (
+            sum +
+            Number(
+              receipt.total
+            )
+          );
 
         },
         0
@@ -583,76 +881,146 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     const reportTotal =
-      document.getElementById("reportMonthTotal");
+      document.getElementById(
+        "reportMonthTotal"
+      );
+
 
     if (reportTotal) {
-      reportTotal.textContent = money(monthlyTotal);
+
+      reportTotal.textContent =
+        money(
+          monthlyTotal
+        );
+
     }
 
 
-    const merchants = {};
+    const merchants =
+      {};
 
-    receipts.forEach(function (receipt) {
 
-      merchants[receipt.merchant] =
-        (merchants[receipt.merchant] || 0)
-        +
-        Number(receipt.total);
+    receipts.forEach(
+      function (receipt) {
 
-    });
+        merchants[
+          receipt.merchant
+        ] =
+          (
+            merchants[
+              receipt.merchant
+            ] || 0
+          )
+          +
+          Number(
+            receipt.total
+          );
+
+      }
+    );
 
 
     const merchantEntries =
-      Object.entries(merchants)
-        .sort(function (a, b) {
-          return b[1] - a[1];
-        });
+      Object
+        .entries(
+          merchants
+        )
+        .sort(
+          function (
+            a,
+            b
+          ) {
+
+            return (
+              b[1] -
+              a[1]
+            );
+
+          }
+        );
 
 
     const topMerchant =
-      document.getElementById("topMerchant");
+      document.getElementById(
+        "topMerchant"
+      );
+
 
     if (topMerchant) {
 
       topMerchant.textContent =
         merchantEntries.length
-          ? merchantEntries[0][0]
-          : "—";
+          ?
+          merchantEntries[0][0]
+          :
+          "—";
 
     }
 
 
-    const categories = {};
+    const categories =
+      {};
 
-    receipts.forEach(function (receipt) {
 
-      const category =
-        receipt.category || "Otros";
+    receipts.forEach(
+      function (receipt) {
 
-      categories[category] =
-        (categories[category] || 0)
-        +
-        Number(receipt.total);
+        const category =
+          receipt.category ||
+          "Otros";
 
-    });
+
+        categories[
+          category
+        ] =
+          (
+            categories[
+              category
+            ] || 0
+          )
+          +
+          Number(
+            receipt.total
+          );
+
+      }
+    );
 
 
     const categoryEntries =
-      Object.entries(categories)
-        .sort(function (a, b) {
-          return b[1] - a[1];
-        });
+      Object
+        .entries(
+          categories
+        )
+        .sort(
+          function (
+            a,
+            b
+          ) {
+
+            return (
+              b[1] -
+              a[1]
+            );
+
+          }
+        );
 
 
     const topCategory =
-      document.getElementById("topCategory");
+      document.getElementById(
+        "topCategory"
+      );
+
 
     if (topCategory) {
 
       topCategory.textContent =
         categoryEntries.length
-          ? categoryEntries[0][0]
-          : "—";
+          ?
+          categoryEntries[0][0]
+          :
+          "—";
 
     }
 
@@ -668,10 +1036,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const receipts =
       getReceipts();
 
-    updateHome(receipts);
-    updateReceipts(receipts);
-    updateExpenses(receipts);
-    updateReports(receipts);
+
+    updateHome(
+      receipts
+    );
+
+    updateReceipts(
+      receipts
+    );
+
+    updateExpenses(
+      receipts
+    );
+
+    updateReports(
+      receipts
+    );
 
   }
 
@@ -680,27 +1060,43 @@ document.addEventListener("DOMContentLoaded", function () {
      GUARDAR RECIBO
   ========================= */
 
-  const saveReceiptButton =
-    document.getElementById("saveReceipt");
-
-
-  if (saveReceiptButton) {
+  if (
+    saveReceiptButton
+  ) {
 
     saveReceiptButton.addEventListener(
       "click",
       function () {
 
         const merchant =
-          merchantInput.value.trim();
+          merchantInput
+            ?
+            merchantInput.value.trim()
+            :
+            "";
 
         const total =
-          Number(totalInput.value);
+          totalInput
+            ?
+            Number(
+              totalInput.value
+            )
+            :
+            0;
 
         const date =
-          dateInput.value;
+          dateInput
+            ?
+            dateInput.value
+            :
+            getToday();
 
         const note =
-          noteInput.value.trim();
+          noteInput
+            ?
+            noteInput.value.trim()
+            :
+            "";
 
 
         if (!merchant) {
@@ -710,52 +1106,71 @@ document.addEventListener("DOMContentLoaded", function () {
           );
 
           return;
+
         }
 
 
-        if (!total || total <= 0) {
+        if (
+          !total ||
+          total <= 0
+        ) {
 
           alert(
             "Escribe el total del recibo."
           );
 
           return;
+
         }
 
 
-        const receipt = {
+        const receipt =
+          {
 
-          id: Date.now(),
+            id:
+              Date.now(),
 
-          merchant: merchant,
+            merchant:
+              merchant,
 
-          total: total,
+            total:
+              total,
 
-          date: date,
+            date:
+              date,
 
-          category: selectedCategory,
+            category:
+              selectedCategory,
 
-          note: note,
+            note:
+              note,
 
-          image: currentImage
+            image:
+              currentImage
 
-        };
+          };
 
 
         const receipts =
           getReceipts();
 
 
-        receipts.unshift(receipt);
+        receipts.unshift(
+          receipt
+        );
 
 
         try {
 
-          saveReceipts(receipts);
+          saveReceipts(
+            receipts
+          );
 
         } catch (error) {
 
-          console.error(error);
+          console.error(
+            error
+          );
 
           alert(
             "No se pudo guardar localmente."
@@ -766,30 +1181,64 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        merchantInput.value = "";
-        totalInput.value = "";
-        noteInput.value = "";
-        dateInput.value = getToday();
+        if (merchantInput) {
+          merchantInput.value = "";
+        }
 
-        currentImage = "";
+        if (totalInput) {
+          totalInput.value = "";
+        }
+
+        if (noteInput) {
+          noteInput.value = "";
+        }
+
+        if (dateInput) {
+          dateInput.value =
+            getToday();
+        }
+
+
+        currentImage =
+          "";
+
 
         if (camera) {
-          camera.value = "";
+
+          camera.value =
+            "";
+
         }
+
 
         if (preview) {
-          preview.src = "";
-          preview.style.display = "none";
+
+          preview.src =
+            "";
+
+          preview.style.display =
+            "none";
+
         }
 
-        if (previewPlaceholder) {
-          previewPlaceholder.style.display = "block";
+
+        if (
+          previewPlaceholder
+        ) {
+
+          previewPlaceholder.style.display =
+            "block";
+
         }
 
 
         updateUI();
 
-        showPage("homePage");
+
+        showPage(
+          "homePage"
+        );
+
 
         alert(
           "Recibo guardado ✅"
@@ -805,10 +1254,6 @@ document.addEventListener("DOMContentLoaded", function () {
      BUSCADOR
   ========================= */
 
-  const searchInput =
-    document.getElementById("receiptSearch");
-
-
   if (searchInput) {
 
     searchInput.addEventListener(
@@ -822,18 +1267,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         const receipts =
-          getReceipts().filter(
-            function (receipt) {
+          getReceipts()
+            .filter(
+              function (receipt) {
 
-              return receipt.merchant
-                .toLowerCase()
-                .includes(search);
+                return (
+                  receipt.merchant ||
+                  ""
+                )
+                  .toLowerCase()
+                  .includes(
+                    search
+                  );
 
-            }
-          );
+              }
+            );
 
 
-        updateReceipts(receipts);
+        updateReceipts(
+          receipts
+        );
 
       }
     );
@@ -843,8 +1296,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* =========================
      GOOGLE DRIVE
-     IMPORTANTE:
-     si Google falla, Scanya sigue funcionando
   ========================= */
 
   function initializeGoogle() {
@@ -852,7 +1303,8 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
 
       if (
-        typeof google === "undefined"
+        typeof google ===
+          "undefined"
         ||
         !google.accounts
         ||
@@ -860,23 +1312,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ) {
 
         console.log(
-          "Google todavía no está listo"
-        );
-
-        return;
-
-      }
-
-
-      if (
-        !GOOGLE_CLIENT_ID
-        ||
-        GOOGLE_CLIENT_ID ===
-          "PEGA_AQUI_TU_CLIENT_ID"
-      ) {
-
-        console.warn(
-          "Falta el Google Client ID"
+          "Google todavía no está listo."
         );
 
         return;
@@ -885,60 +1321,74 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
       tokenClient =
-        google.accounts.oauth2.initTokenClient({
+        google.accounts.oauth2
+          .initTokenClient(
+            {
 
-          client_id:
-            GOOGLE_CLIENT_ID,
+              client_id:
+                GOOGLE_CLIENT_ID,
 
-          scope:
-            "https://www.googleapis.com/auth/drive.file",
+              scope:
+                "https://www.googleapis.com/auth/drive.file",
 
-          callback:
-            function (response) {
+              callback:
+                function (response) {
 
-              if (
-                response.error
-              ) {
+                  if (
+                    response.error
+                  ) {
 
-                console.error(response);
+                    console.error(
+                      response
+                    );
 
-                alert(
-                  "Google no pudo conectarse."
-                );
+                    alert(
+                      "Google no pudo conectarse."
+                    );
 
-                return;
-              }
+                    return;
 
-
-              googleAccessToken =
-                response.access_token;
-
-
-              if (driveStatus) {
-                driveStatus.textContent =
-                  "Conectado";
-              }
+                  }
 
 
-              if (connectDriveBtn) {
-
-                connectDriveBtn.textContent =
-                  "Conectado ✓";
-
-              }
+                  googleAccessToken =
+                    response.access_token;
 
 
-              if (driveCard) {
+                  if (
+                    driveStatus
+                  ) {
 
-                driveCard.classList.add(
-                  "connected"
-                );
+                    driveStatus.textContent =
+                      "Conectado";
 
-              }
+                  }
+
+
+                  if (
+                    connectDriveBtn
+                  ) {
+
+                    connectDriveBtn.textContent =
+                      "Conectado ✓";
+
+                  }
+
+
+                  if (
+                    driveCard
+                  ) {
+
+                    driveCard.classList.add(
+                      "connected"
+                    );
+
+                  }
+
+                }
 
             }
-
-        });
+          );
 
 
       console.log(
@@ -948,7 +1398,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (error) {
 
       console.error(
-        "Error de Google:",
+        "Error iniciando Google:",
         error
       );
 
@@ -957,23 +1407,42 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  if (connectDriveBtn) {
+  if (
+    connectDriveBtn
+  ) {
 
     connectDriveBtn.addEventListener(
       "click",
       function () {
 
-        if (!tokenClient) {
+        if (
+          googleAccessToken
+        ) {
+
+          alert(
+            "Google Drive ya está conectado."
+          );
+
+          return;
+
+        }
+
+
+        if (
+          !tokenClient
+        ) {
 
           initializeGoogle();
 
         }
 
 
-        if (!tokenClient) {
+        if (
+          !tokenClient
+        ) {
 
           alert(
-            "Google Drive todavía no está disponible. La app seguirá funcionando normalmente."
+            "Google todavía está cargando. Intenta nuevamente en unos segundos."
           );
 
           return;
@@ -983,13 +1452,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
-          tokenClient.requestAccessToken({
-            prompt: "consent"
-          });
+          tokenClient
+            .requestAccessToken(
+              {
+                prompt:
+                  "consent"
+              }
+            );
 
         } catch (error) {
 
-          console.error(error);
+          console.error(
+            error
+          );
 
           alert(
             "No se pudo abrir Google."
@@ -1002,6 +1477,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   }
 
+
+  /* Intentar iniciar Google
+     después de que cargue la página */
 
   setTimeout(
     initializeGoogle,
